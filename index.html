@@ -17,9 +17,9 @@
     <meta property="og:description" content="Temukan semua tripel Pythagoras dengan mudah! Alat online untuk mencari kombinasi bilangan yang memenuhi a² + b² = c².">
     
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:title" content="Pencari Tripel Pythagoras">
-    <meta property="twitter:description" content="Temukan semua tripel Pythagoras dengan mudah! Alat online untuk mencari kombinasi bilangan yang memenuhi a² + b² = c².">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Pencari Tripel Pythagoras">
+    <meta name="twitter:description" content="Temukan semua tripel Pythagoras dengan mudah! Alat online untuk mencari kombinasi bilangan yang memenuhi a² + b² = c².">
     
     <link rel="stylesheet" href="style.css">
 </head>
@@ -32,9 +32,9 @@
         </header>
 
         <nav class="main-nav" aria-label="Navigasi aplikasi">
-            <button type="button" class="nav-btn active" data-section="calculator-section">Kalkulator</button>
-            <button type="button" class="nav-btn" data-section="triples-section">Tripel Pythagoras</button>
-            <button type="button" class="nav-btn" data-section="learn-section">Materi</button>
+            <button type="button" class="nav-btn active" data-section="calculator-section" aria-controls="calculator-section">Kalkulator</button>
+            <button type="button" class="nav-btn" data-section="triples-section" aria-controls="triples-section">Tripel Pythagoras</button>
+            <button type="button" class="nav-btn" data-section="learn-section" aria-controls="learn-section">Materi</button>
         </nav>
 
         <section class="calculator-section app-section" id="calculator-section">
@@ -113,7 +113,7 @@
             </div>
         </section>
         
-        <section class="results-section app-section">
+        <section class="results-section app-section" id="results-section">
             <div class="results-header">
                 <h2>Hasil Pencarian</h2>
                 <div class="results-count" id="results-count" aria-live="polite">0 tripel ditemukan</div>

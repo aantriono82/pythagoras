@@ -13,6 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
         c: document.getElementById('side-c')
     };
     const calculationResults = document.getElementById('calculation-results');
+    let calculationTimer = null;
+    let calculationRequest = 0;
 
     const formatNumber = value => Number.isInteger(value) ? String(value) : value.toFixed(3).replace(/0+$/, '').replace(/\.$/, '');
 
@@ -38,17 +40,30 @@ document.addEventListener('DOMContentLoaded', () => {
             status.textContent = 'Isi tepat dua sisi dengan nilai lebih besar dari 0.';
             status.className = 'calculator-status error-text';
             calculationResults.hidden = true;
+            updateTriangleVisual({
+                a: Number.isFinite(values.a) && values.a > 0 ? values.a : null,
+                b: Number.isFinite(values.b) && values.b > 0 ? values.b : null,
+                c: Number.isFinite(values.c) && values.c > 0 ? values.c : null
+            });
             return;
         }
 
         let missing;
         if (values.a === null) {
             missing = 'a';
-            if (values.c <= values.b) return invalidTriangle(status);
+            if (values.c <= values.b) {
+                invalidTriangle(status);
+                updateTriangleVisual(values);
+                return;
+            }
             values.a = Math.sqrt(values.c ** 2 - values.b ** 2);
         } else if (values.b === null) {
             missing = 'b';
-            if (values.c <= values.a) return invalidTriangle(status);
+            if (values.c <= values.a) {
+                invalidTriangle(status);
+                updateTriangleVisual(values);
+                return;
+            }
             values.b = Math.sqrt(values.c ** 2 - values.a ** 2);
         } else {
             missing = 'c';
@@ -114,13 +129,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateUrl() {
         const params = new URLSearchParams({ limit: limitInput.value, primitive: primitiveCheckbox.checked ? 'true' : 'false' });
-        history.replaceState(null, '', `${window.location.pathname}?${params}`);
+        const url = new URL(window.location.href);
+        url.search = params.toString();
+        history.replaceState(null, '', url);
     }
 
     function setLoading(isLoading) {
         loader.style.display = isLoading ? 'block' : 'none';
         loader.setAttribute('aria-hidden', String(!isLoading));
+        loader.setAttribute('aria-busy', String(isLoading));
         calculateBtn.disabled = isLoading;
+        limitInput.disabled = isLoading;
+        primitiveCheckbox.disabled = isLoading;
     }
 
     function showMessage(message, type = 'info') {
@@ -172,8 +192,12 @@ document.addEventListener('DOMContentLoaded', () => {
             limitInput.focus();
             return;
         }
+        if (calculationTimer !== null) window.clearTimeout(calculationTimer);
+        const request = ++calculationRequest;
         setLoading(true);
-        window.setTimeout(() => {
+        calculationTimer = window.setTimeout(() => {
+            calculationTimer = null;
+            if (request !== calculationRequest) return;
             try {
                 displayResults(findTriples(limit, primitiveCheckbox.checked));
                 updateUrl();
@@ -181,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error(error);
                 showMessage('Terjadi kesalahan dalam perhitungan.', 'error');
             } finally {
-                setLoading(false);
+                if (request === calculationRequest) setLoading(false);
             }
         }, 0);
     }
@@ -216,8 +240,15 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         if (platform === 'native') {
-            if (navigator.share) await navigator.share({ title, text, url }).catch(() => {});
-            else await copyLink();
+            if (!navigator.share) {
+                await copyLink();
+                return;
+            }
+            try {
+                await navigator.share({ title, text, url });
+            } catch (error) {
+                if (error?.name !== 'AbortError') await copyLink();
+            }
             return;
         }
         const shareUrls = {
