@@ -30,8 +30,71 @@
             <p class="subtitle">Temukan semua kombinasi bilangan yang memenuhi rumus a² + b² = c²</p>
             <div class="formula" aria-label="a kuadrat ditambah b kuadrat sama dengan c kuadrat">a² + b² = c²</div>
         </header>
+
+        <nav class="main-nav" aria-label="Navigasi aplikasi">
+            <button type="button" class="nav-btn active" data-section="calculator-section">Kalkulator</button>
+            <button type="button" class="nav-btn" data-section="triples-section">Tripel Pythagoras</button>
+            <button type="button" class="nav-btn" data-section="learn-section">Materi</button>
+        </nav>
+
+        <section class="calculator-section app-section" id="calculator-section">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">Eksperimen geometri</p>
+                    <h2>Kalkulator Segitiga Siku-siku</h2>
+                    <p class="section-description">Masukkan dua sisi untuk menghitung sisi ketiga, luas, keliling, dan sudut segitiga.</p>
+                </div>
+                <span class="section-badge">a² + b² = c²</span>
+            </div>
+
+            <div class="calculator-layout">
+                <form class="calculator-form" id="triangle-form">
+                    <div class="field-grid">
+                        <div class="input-group">
+                            <label for="side-a">Sisi a</label>
+                            <input type="number" id="side-a" min="0" step="any" placeholder="Contoh: 3" inputmode="decimal">
+                            <span class="field-hint">Sisi siku-siku</span>
+                        </div>
+                        <div class="input-group">
+                            <label for="side-b">Sisi b</label>
+                            <input type="number" id="side-b" min="0" step="any" placeholder="Contoh: 4" inputmode="decimal">
+                            <span class="field-hint">Sisi siku-siku</span>
+                        </div>
+                        <div class="input-group">
+                            <label for="side-c">Sisi c</label>
+                            <input type="number" id="side-c" min="0" step="any" placeholder="Contoh: 5" inputmode="decimal">
+                            <span class="field-hint">Sisi miring</span>
+                        </div>
+                    </div>
+                    <p class="form-hint">Isi tepat dua kolom. Nilai harus lebih besar dari 0.</p>
+                    <button type="submit" id="calculate-triangle">Hitung Segitiga</button>
+                    <button type="button" class="secondary-btn" id="clear-triangle">Bersihkan</button>
+                    <p class="calculator-status" id="calculator-status" role="status" aria-live="polite"></p>
+                </form>
+
+                <div class="triangle-card">
+                    <svg id="triangle-visual" viewBox="0 0 320 230" role="img" aria-labelledby="triangle-visual-title triangle-visual-desc">
+                        <title id="triangle-visual-title">Visualisasi segitiga siku-siku</title>
+                        <desc id="triangle-visual-desc">Segitiga dengan sisi a, b, dan c.</desc>
+                        <polygon class="triangle-shape" points="42,190 42,38 278,190" />
+                        <path class="right-angle" d="M42 166 L66 166 L66 190" />
+                        <text class="svg-label label-a" x="23" y="118">a</text>
+                        <text class="svg-label label-b" x="155" y="213">b</text>
+                        <text class="svg-label label-c" x="166" y="100">c</text>
+                    </svg>
+                    <p class="visual-caption">Masukkan dua sisi untuk memperbarui visualisasi.</p>
+                </div>
+            </div>
+
+            <div class="calculation-results" id="calculation-results" hidden>
+                <div class="metric-card"><span>Sisi belum diketahui</span><strong id="missing-side-result">—</strong></div>
+                <div class="metric-card"><span>Luas</span><strong id="area-result">—</strong></div>
+                <div class="metric-card"><span>Keliling</span><strong id="perimeter-result">—</strong></div>
+                <div class="metric-card"><span>Sudut lancip</span><strong id="angles-result">—</strong></div>
+            </div>
+        </section>
         
-        <section class="input-section">
+        <section class="input-section app-section" id="triples-section">
             <div class="input-group">
                 <label for="limit">Batas maksimal sisi miring (c):</label>
                 <input type="number" id="limit" min="1" max="1000" value="50" inputmode="numeric" placeholder="Masukkan batas maksimal (1-1000)" aria-describedby="limit-hint">
@@ -50,7 +113,7 @@
             </div>
         </section>
         
-        <section class="results-section">
+        <section class="results-section app-section">
             <div class="results-header">
                 <h2>Hasil Pencarian</h2>
                 <div class="results-count" id="results-count" aria-live="polite">0 tripel ditemukan</div>
@@ -76,7 +139,7 @@
             </div>
         </section>
         
-        <section class="info-section">
+        <section class="info-section app-section" id="learn-section">
             <h3>Tentang Tripel Pythagoras</h3>
             <div class="triangle-diagram" role="img" aria-label="Segitiga siku-siku dengan sisi a dan b serta sisi miring c">
                 <svg viewBox="0 0 240 150" aria-hidden="true">

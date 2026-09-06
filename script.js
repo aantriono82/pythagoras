@@ -6,6 +6,84 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultsCount = document.getElementById('results-count');
     const noResults = document.getElementById('no-results');
     const loader = document.getElementById('loader');
+    const triangleForm = document.getElementById('triangle-form');
+    const triangleInputs = {
+        a: document.getElementById('side-a'),
+        b: document.getElementById('side-b'),
+        c: document.getElementById('side-c')
+    };
+    const calculationResults = document.getElementById('calculation-results');
+
+    const formatNumber = value => Number.isInteger(value) ? String(value) : value.toFixed(3).replace(/0+$/, '').replace(/\.$/, '');
+
+    function updateTriangleVisual(values) {
+        const labels = document.querySelectorAll('.svg-label');
+        const names = ['a', 'b', 'c'];
+        labels.forEach((label, index) => {
+            const name = names[index];
+            label.textContent = values[name] !== null && values[name] !== undefined ? `${name} = ${formatNumber(values[name])}` : name;
+        });
+        const description = values.a && values.b && values.c
+            ? `Segitiga siku-siku dengan sisi a ${formatNumber(values.a)}, sisi b ${formatNumber(values.b)}, dan sisi miring c ${formatNumber(values.c)}.`
+            : 'Segitiga siku-siku dengan sisi a, b, dan sisi miring c.';
+        document.getElementById('triangle-visual-desc').textContent = description;
+    }
+
+    function calculateTriangle(event) {
+        event?.preventDefault();
+        const values = Object.fromEntries(Object.entries(triangleInputs).map(([name, input]) => [name, input.value === '' ? null : Number(input.value)]));
+        const filled = Object.values(values).filter(value => value !== null);
+        const status = document.getElementById('calculator-status');
+        if (filled.length !== 2 || filled.some(value => !Number.isFinite(value) || value <= 0)) {
+            status.textContent = 'Isi tepat dua sisi dengan nilai lebih besar dari 0.';
+            status.className = 'calculator-status error-text';
+            calculationResults.hidden = true;
+            return;
+        }
+
+        let missing;
+        if (values.a === null) {
+            missing = 'a';
+            if (values.c <= values.b) return invalidTriangle(status);
+            values.a = Math.sqrt(values.c ** 2 - values.b ** 2);
+        } else if (values.b === null) {
+            missing = 'b';
+            if (values.c <= values.a) return invalidTriangle(status);
+            values.b = Math.sqrt(values.c ** 2 - values.a ** 2);
+        } else {
+            missing = 'c';
+            values.c = Math.hypot(values.a, values.b);
+        }
+
+        triangleInputs[missing].value = formatNumber(values[missing]);
+        const area = (values.a * values.b) / 2;
+        const perimeter = values.a + values.b + values.c;
+        const angleA = Math.atan(values.a / values.b) * 180 / Math.PI;
+        const angleB = 90 - angleA;
+        document.getElementById('missing-side-result').textContent = `${missing} = ${formatNumber(values[missing])}`;
+        document.getElementById('area-result').textContent = formatNumber(area);
+        document.getElementById('perimeter-result').textContent = formatNumber(perimeter);
+        document.getElementById('angles-result').textContent = `${formatNumber(angleA)}° dan ${formatNumber(angleB)}°`;
+        calculationResults.hidden = false;
+        status.textContent = `Berhasil menghitung sisi ${missing}.`;
+        status.className = 'calculator-status success-text';
+        updateTriangleVisual(values);
+    }
+
+    function invalidTriangle(status) {
+        status.textContent = 'Sisi miring (c) harus lebih panjang daripada sisi siku-siku.';
+        status.className = 'calculator-status error-text';
+        calculationResults.hidden = true;
+    }
+
+    function clearTriangle() {
+        Object.values(triangleInputs).forEach(input => { input.value = ''; });
+        calculationResults.hidden = true;
+        const status = document.getElementById('calculator-status');
+        status.textContent = '';
+        status.className = 'calculator-status';
+        updateTriangleVisual({ a: null, b: null, c: null });
+    }
 
     function gcd(a, b) {
         while (b !== 0) [a, b] = [b, a % b];
@@ -159,6 +237,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     calculateBtn.addEventListener('click', calculateTriples);
+    triangleForm.addEventListener('submit', calculateTriangle);
+    document.getElementById('clear-triangle').addEventListener('click', clearTriangle);
+    document.querySelectorAll('.nav-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            document.querySelectorAll('.nav-btn').forEach(item => item.classList.remove('active'));
+            button.classList.add('active');
+            document.getElementById(button.dataset.section).scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    });
     limitInput.addEventListener('input', () => {
         const value = Number(limitInput.value);
         if (limitInput.value !== '' && Number.isFinite(value)) limitInput.value = Math.min(1000, Math.max(1, value));
